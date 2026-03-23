@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Virus Zoo - Malware Museum for Students</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span>🦠</span>
+                <h1>Virus Zoo</h1>
+                <span>🏛️</span>
+            </div>
+            <div class="nav">
+                <a href="#" onclick="showHome()">🏠 Home</a>
+                <a href="#" onclick="showExhibits()">🦠 Exhibits</a>
+                <a href="#" onclick="showTimeline()">📅 Timeline</a>
+                <a href="#" onclick="showQuiz()">❓ Quiz</a>
+                <a href="#" onclick="showGlossary()">📖 Glossary</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="mainContent">
+        <div id="homePage">
+            <div class="hero">
+                <h2>Welcome to the Virus Zoo 🦠🏛️</h2>
+                <p>Explore the world's most famous malware specimens in our digital museum. Learn how they work, how they spread, and how to protect yourself!</p>
+            </div>
+            <div class="museum-map">
+                <h3>🗺️ Museum Map</h3>
+                <div class="map-grid" id="museumMap"></div>
+            </div>
+            <div class="section-title">🦠 Featured Malware Specimens</div>
+            <div class="malware-grid" id="featuredGrid"></div>
+        </div>
+
+        <div id="exhibitsPage" style="display: none;">
+            <div class="section-title">🦠 All Malware Exhibits (15 Specimens)</div>
+            <div class="malware-grid" id="allMalwareGrid"></div>
+        </div>
+
+        <div id="timelinePage" style="display: none;">
+            <div class="section-title">📅 Malware Evolution Timeline</div>
+            <div id="timelineContainer"></div>
+        </div>
+
+        <div id="quizPage" style="display: none;">
+            <div class="section-title">❓ Test Your Knowledge</div>
+            <div class="quiz-section" id="quizContainer"></div>
+        </div>
+
+        <div id="glossaryPage" style="display: none;">
+            <div class="section-title">📖 Cybersecurity Glossary</div>
+            <div id="glossaryContainer"></div>
+        </div>
+    </div>
+
+    <div id="malwareModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🦠 Virus Zoo | A Cybersecurity Education Project | Bayero University Kano</p>
+        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Learn about malware and stay safe online!</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

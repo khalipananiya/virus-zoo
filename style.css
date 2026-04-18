@@ -418,3 +418,224 @@ button:hover {
         padding: 1.5rem;
     }
 }
+
+.sim-note {
+    color: #7ef7c8;
+    font-weight: 600;
+}
+
+.simulation-launch-btn {
+    margin-top: 0.8rem;
+    width: 100%;
+}
+
+.simulation-launch-btn.compact {
+    padding: 0.65rem 1rem;
+    font-size: 0.95rem;
+}
+
+.secondary-btn {
+    background: transparent;
+    color: #00ff9d;
+    border: 1px solid #00ff9d;
+}
+
+.secondary-btn:hover {
+    background: rgba(0,255,157,0.12);
+}
+
+.modal-action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    align-items: center;
+}
+
+.simulation-section {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #2f4958;
+    border-radius: 16px;
+    background: rgba(10, 15, 42, 0.65);
+}
+
+.simulation-intro {
+    color: #c6fbe7;
+}
+
+.simulation-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    align-items: center;
+    margin: 1rem 0 0.7rem;
+}
+
+.simulation-chip {
+    display: inline-block;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(0,255,157,0.18);
+    color: #8affcf;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.simulation-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.simulation-legend span {
+    background: #203243;
+    color: #dffef1;
+    border-radius: 999px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.82rem;
+}
+
+.simulation-canvas {
+    min-height: 280px;
+    border-radius: 14px;
+    padding: 1rem;
+    background: linear-gradient(180deg, #10192f, #0b1222);
+    border: 1px solid #203243;
+}
+
+.simulation-log {
+    margin-top: 0.8rem;
+    background: #0f1d2f;
+    border-left: 4px solid #00ff9d;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+}
+
+.sim-email-grid, .sim-network-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.8rem;
+}
+
+.email-node, .network-node, .ics-box, .peer-host, .file-block, .host-panel {
+    background: #1b2a3c;
+    border: 1px solid #345066;
+    border-radius: 12px;
+    padding: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.node-title, .panel-title, .file-name {
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+}
+
+.node-status, .panel-sub, .file-state {
+    font-size: 0.88rem;
+    color: #c5d6e4;
+}
+
+.email-node.infected, .network-node.infected, .host-panel.infected, .peer-host.infected, .ics-box.infected {
+    background: rgba(255, 93, 93, 0.18);
+    border-color: #ff6b6b;
+    box-shadow: 0 0 0 1px rgba(255,107,107,0.15), 0 0 18px rgba(255,107,107,0.22);
+}
+
+.network-node.clean {
+    background: rgba(58, 88, 112, 0.35);
+}
+
+.email-node.completed {
+    border-color: #00ff9d;
+}
+
+.mail-flash {
+    animation: pulseFlash 0.7s ease;
+}
+
+@keyframes pulseFlash {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.sim-ransomware-layout {
+    display: grid;
+    gap: 1rem;
+}
+
+.file-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+}
+
+.file-block.encrypted {
+    background: rgba(255, 149, 0, 0.15);
+    border-color: #ffb347;
+}
+
+.ransom-banner {
+    background: rgba(255, 71, 87, 0.2);
+    border: 1px solid #ff6b81;
+    color: #ffe4e8;
+    padding: 0.9rem;
+    border-radius: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.peer-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.7rem;
+}
+
+.sim-ics-layout {
+    display: grid;
+    gap: 1rem;
+}
+
+.ics-arrow {
+    text-align: center;
+    font-size: 1.4rem;
+    color: #00ff9d;
+}
+
+.ics-box.warning {
+    background: rgba(255, 179, 71, 0.18);
+    border-color: #ffb347;
+}
+
+.gauge-wrap, .ddos-meter {
+    margin-top: 0.5rem;
+}
+
+.gauge-label, .ddos-label {
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+}
+
+.gauge-bar {
+    width: 100%;
+    height: 16px;
+    background: #1d2a38;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid #345066;
+}
+
+.gauge-bar span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, #00ff9d, #ffb347, #ff6b6b);
+    transition: width 0.5s ease;
+}
+
+@media (max-width: 768px) {
+    .peer-row {
+        grid-template-columns: 1fr;
+    }
+}

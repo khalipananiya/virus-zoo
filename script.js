@@ -924,6 +924,294 @@ const quizQuestions = [
 
 let quizAnswered = new Array(quizQuestions.length).fill(false);
 
+
+const simulationEnabledMalware = ["ILOVEYOU", "Code Red", "WannaCry", "Stuxnet", "Mirai"];
+
+const simulationConfigs = {
+    "ILOVEYOU": {
+        title: "Email Worm Spread",
+        type: "email",
+        intro: "Educational simulation: watch how one opened attachment can cascade through an address book.",
+        controls: ['Start Simulation', 'Reset'],
+        legend: ['Inbox', 'Opened attachment', 'Mass mailing']
+    },
+    "Code Red": {
+        title: "Web Server Scanning & Defacement",
+        type: "network",
+        intro: "Educational simulation: infected server scans random targets, exploits vulnerable IIS hosts, then defaces them.",
+        controls: ['Start Simulation', 'Reset'],
+        legend: ['Scanning', 'Vulnerable server', 'Defaced server']
+    },
+    "WannaCry": {
+        title: "Ransomware Encryption Chain",
+        type: "ransomware",
+        intro: "Educational simulation: SMB spread reaches hosts, encrypts files, and displays a ransom state.",
+        controls: ['Start Simulation', 'Reset'],
+        legend: ['Healthy files', 'Encrypted files', 'Propagation']
+    },
+    "Stuxnet": {
+        title: "Industrial Control Sabotage",
+        type: "ics",
+        intro: "Educational simulation: malware reaches engineering station, alters PLC commands, and destabilizes centrifuge speeds while normal readings appear.",
+        controls: ['Start Simulation', 'Reset'],
+        legend: ['Engineering station', 'PLC logic altered', 'Unsafe centrifuge speed']
+    },
+    "Mirai": {
+        title: "IoT Botnet Takeover",
+        type: "network",
+        intro: "Educational simulation: insecure IoT devices are found, logged into with default credentials, and coordinated into a DDoS botnet.",
+        controls: ['Start Simulation', 'Reset'],
+        legend: ['IoT scan', 'Bot recruited', 'DDoS traffic']
+    }
+};
+
+let activeSimulationInterval = null;
+
+function hasSimulation(name) {
+    return simulationEnabledMalware.includes(name);
+}
+
+function getSimulationButton(name, compact = false) {
+    if (!hasSimulation(name)) return '';
+    return `<button class="simulation-launch-btn ${compact ? 'compact' : ''}" onclick="event.stopPropagation(); launchSimulation('${name}')">▶ Virtual Simulation</button>`;
+}
+
+function launchSimulation(name) {
+    showMalwareDetails(name, true);
+}
+
+function stopActiveSimulation() {
+    if (activeSimulationInterval) {
+        clearInterval(activeSimulationInterval);
+        activeSimulationInterval = null;
+    }
+}
+
+function getSimulationMarkup(name) {
+    if (!hasSimulation(name)) return '';
+    const sim = simulationConfigs[name];
+    return `
+        <div class="simulation-section">
+            <h3>🧪 Virtual Simulation</h3>
+            <p class="simulation-intro">${sim.intro}</p>
+            <div class="simulation-toolbar">
+                <span class="simulation-chip">Live Demo</span>
+                <button onclick="startSimulation('${name}')">${sim.controls[0]}</button>
+                <button class="secondary-btn" onclick="resetSimulation('${name}')">${sim.controls[1]}</button>
+            </div>
+            <div class="simulation-legend">
+                ${sim.legend.map(item => `<span>${item}</span>`).join('')}
+            </div>
+            <div id="simulationCanvas" class="simulation-canvas ${sim.type}"></div>
+            <div id="simulationLog" class="simulation-log">Ready. Click <strong>Start Simulation</strong> to watch ${name} behavior.</div>
+        </div>
+    `;
+}
+
+function resetSimulation(name) {
+    stopActiveSimulation();
+    const canvas = document.getElementById('simulationCanvas');
+    const log = document.getElementById('simulationLog');
+    if (!canvas || !log) return;
+
+    if (name === 'ILOVEYOU') {
+        const users = ['User A', 'User B', 'User C', 'User D', 'User E', 'User F'];
+        canvas.innerHTML = `
+            <div class="sim-email-grid">
+                ${users.map((user, idx) => `
+                    <div class="email-node ${idx === 0 ? 'infected' : ''}" data-index="${idx}">
+                        <div class="node-title">${user}</div>
+                        <div class="node-status">${idx === 0 ? 'Opened attachment' : 'Inbox waiting'}</div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="sim-mail-lines"></div>
+        `;
+        log.innerHTML = 'Ready. Initial victim opened the attachment. Start to watch it mail itself to contacts.';
+    } else if (name === 'Code Red') {
+        const nodes = ['Infected IIS', 'Server 2', 'Server 3', 'Server 4', 'Server 5', 'Server 6'];
+        canvas.innerHTML = `
+            <div class="sim-network-grid">
+                ${nodes.map((node, idx) => `
+                    <div class="network-node ${idx === 0 ? 'infected' : 'clean'}" data-index="${idx}">
+                        <div class="node-title">${node}</div>
+                        <div class="node-status">${idx === 0 ? 'Scanning /default.ida' : 'Waiting'}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        log.innerHTML = 'Ready. The infected web server is poised to scan random IIS targets.';
+    } else if (name === 'WannaCry') {
+        const files = ['Documents', 'Pictures', 'Projects', 'Backups', 'Shared Drive', 'Finance'];
+        canvas.innerHTML = `
+            <div class="sim-ransomware-layout">
+                <div class="host-panel infected">
+                    <div class="panel-title">Patient Zero</div>
+                    <div class="panel-sub">SMB exposed host</div>
+                </div>
+                <div class="file-grid">
+                    ${files.map(file => `
+                        <div class="file-block">
+                            <div class="file-name">${file}</div>
+                            <div class="file-state">Healthy</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="ransom-banner">No encryption yet</div>
+                <div class="peer-row">
+                    <div class="peer-host">Host B</div>
+                    <div class="peer-host">Host C</div>
+                    <div class="peer-host">Host D</div>
+                </div>
+            </div>
+        `;
+        log.innerHTML = 'Ready. Start to simulate SMB spread and file encryption.';
+    } else if (name === 'Stuxnet') {
+        canvas.innerHTML = `
+            <div class="sim-ics-layout">
+                <div class="ics-box workstation">
+                    <div class="node-title">Engineering Station</div>
+                    <div class="node-status">Monitoring normal values</div>
+                </div>
+                <div class="ics-arrow">→</div>
+                <div class="ics-box plc">
+                    <div class="node-title">PLC Logic</div>
+                    <div class="node-status">Normal code</div>
+                </div>
+                <div class="ics-arrow">→</div>
+                <div class="ics-box centrifuge">
+                    <div class="node-title">Centrifuge Array</div>
+                    <div class="node-status">Speed: 1064 Hz</div>
+                </div>
+                <div class="gauge-wrap">
+                    <div class="gauge-label">Rotor Speed</div>
+                    <div class="gauge-bar"><span style="width:40%"></span></div>
+                </div>
+            </div>
+        `;
+        log.innerHTML = 'Ready. Start to watch PLC instructions get altered while the operator screen appears normal.';
+    } else if (name === 'Mirai') {
+        const devices = ['Camera', 'Router', 'DVR', 'Smart Plug', 'IP Cam', 'Gateway'];
+        canvas.innerHTML = `
+            <div class="sim-network-grid iot">
+                ${devices.map((device, idx) => `
+                    <div class="network-node ${idx === 0 ? 'infected' : 'clean'}" data-index="${idx}">
+                        <div class="node-title">${device}</div>
+                        <div class="node-status">${idx === 0 ? 'Bot scanning Telnet' : 'Default creds enabled'}</div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="ddos-meter">
+                <div class="ddos-label">DDoS Output</div>
+                <div class="gauge-bar"><span style="width:10%"></span></div>
+            </div>
+        `;
+        log.innerHTML = 'Ready. One infected IoT device begins scanning for more weak devices.';
+    }
+}
+
+function startSimulation(name) {
+    resetSimulation(name);
+    const log = document.getElementById('simulationLog');
+    const canvas = document.getElementById('simulationCanvas');
+    if (!canvas || !log) return;
+
+    if (name === 'ILOVEYOU') {
+        const nodes = [...canvas.querySelectorAll('.email-node')];
+        let step = 1;
+        activeSimulationInterval = setInterval(() => {
+            if (step < nodes.length) {
+                nodes[step].classList.add('infected', 'mail-flash');
+                nodes[step].querySelector('.node-status').textContent = 'Received and executed .vbs';
+                log.innerHTML = `Step ${step}: Contact ${step + 1} opens the love-letter attachment and auto-mails more contacts.`;
+                step++;
+            } else {
+                nodes.forEach(node => node.classList.add('completed'));
+                log.innerHTML = 'Simulation complete: the worm spread through the visible address book and generated a mass-mail event.';
+                stopActiveSimulation();
+            }
+        }, 900);
+    } else if (name === 'Code Red') {
+        const nodes = [...canvas.querySelectorAll('.network-node')];
+        let step = 1;
+        activeSimulationInterval = setInterval(() => {
+            if (step < nodes.length) {
+                nodes[step].classList.remove('clean');
+                nodes[step].classList.add('infected');
+                nodes[step].querySelector('.node-status').textContent = 'Defaced after exploit';
+                log.innerHTML = `Step ${step}: A vulnerable IIS host is found through scanning and gets defaced.`;
+                step++;
+            } else {
+                log.innerHTML = 'Simulation complete: scanning wave exhausted the visible segment and multiple servers were defaced.';
+                stopActiveSimulation();
+            }
+        }, 950);
+    } else if (name === 'WannaCry') {
+        const files = [...canvas.querySelectorAll('.file-block')];
+        const peers = [...canvas.querySelectorAll('.peer-host')];
+        const banner = canvas.querySelector('.ransom-banner');
+        let step = 0;
+        activeSimulationInterval = setInterval(() => {
+            if (step < files.length) {
+                files[step].classList.add('encrypted');
+                files[step].querySelector('.file-state').textContent = 'Encrypted';
+                banner.textContent = 'Encrypting files...';
+                log.innerHTML = `Step ${step + 1}: ${files[step].querySelector('.file-name').textContent} is encrypted and ransom pressure increases.`;
+            } else if (step < files.length + peers.length) {
+                const peer = peers[step - files.length];
+                peer.classList.add('infected');
+                banner.textContent = 'Ransom note displayed';
+                log.innerHTML = `Propagation: ${peer.textContent} is reached over SMB and becomes another victim.`;
+            } else {
+                banner.textContent = 'Files locked - ransom note active';
+                log.innerHTML = 'Simulation complete: local encryption and network propagation are visible.';
+                stopActiveSimulation();
+            }
+            step++;
+        }, 850);
+    } else if (name === 'Stuxnet') {
+        const boxes = canvas.querySelectorAll('.ics-box');
+        const gauge = canvas.querySelector('.gauge-bar span');
+        const statuses = [...boxes].map(box => box.querySelector('.node-status'));
+        const sequence = [
+            () => { statuses[0].textContent = 'USB-delivered infection present'; log.innerHTML = 'Step 1: malware reaches the engineering station.'; },
+            () => { boxes[1].classList.add('infected'); statuses[1].textContent = 'PLC code subtly altered'; log.innerHTML = 'Step 2: PLC logic is modified behind the scenes.'; },
+            () => { gauge.style.width = '88%'; boxes[2].classList.add('warning'); statuses[2].textContent = 'Speed spike: 1410 Hz'; log.innerHTML = 'Step 3: centrifuge speed is pushed into an unsafe range.'; },
+            () => { statuses[0].textContent = 'Operator view still looks normal'; log.innerHTML = 'Step 4: false feedback masks the sabotage from operators.'; },
+            () => { gauge.style.width = '24%'; statuses[2].textContent = 'Speed drop: 2 Hz'; log.innerHTML = 'Step 5: abrupt slowdown stresses the equipment again.'; },
+        ];
+        let step = 0;
+        activeSimulationInterval = setInterval(() => {
+            if (step < sequence.length) {
+                sequence[step]();
+                step++;
+            } else {
+                log.innerHTML = 'Simulation complete: PLC manipulation caused unsafe physical behavior while normal readings were spoofed.';
+                stopActiveSimulation();
+            }
+        }, 1100);
+    } else if (name === 'Mirai') {
+        const nodes = [...canvas.querySelectorAll('.network-node')];
+        const meter = canvas.querySelector('.gauge-bar span');
+        let step = 1;
+        activeSimulationInterval = setInterval(() => {
+            if (step < nodes.length) {
+                nodes[step].classList.remove('clean');
+                nodes[step].classList.add('infected');
+                nodes[step].querySelector('.node-status').textContent = 'Joined botnet';
+                meter.style.width = `${Math.min(100, 10 + step * 15)}%`;
+                log.innerHTML = `Step ${step}: another IoT device is recruited through default credentials.`;
+                step++;
+            } else {
+                meter.style.width = '100%';
+                log.innerHTML = 'Simulation complete: the visible IoT devices are now coordinated for a DDoS burst.';
+                stopActiveSimulation();
+            }
+        }, 900);
+    }
+}
+
+
 function showHome() {
     document.getElementById('homePage').style.display = 'block';
     document.getElementById('exhibitsPage').style.display = 'none';
@@ -993,6 +1281,8 @@ function createMalwareCard(m) {
                 <p>${m.desc.substring(0, 80)}...</p>
                 <p class="damage">💀 Damage: ${m.damage}</p>
                 <p>🔐 CVE: ${m.cve.substring(0, 30)}</p>
+                ${hasSimulation(m.name) ? '<p class="sim-note">🧪 Interactive simulation available</p>' : ''}
+                ${getSimulationButton(m.name, true)}
             </div>
         </div>
     `;
@@ -1121,7 +1411,7 @@ function loadGlossary() {
     `;
 }
 
-function showMalwareDetails(name) {
+function showMalwareDetails(name, openSimulation = false) {
     const malware = malwareData.find(m => m.name === name);
     if (!malware) return;
     
@@ -1174,12 +1464,23 @@ function showMalwareDetails(name) {
         <h3>🤓 Fun Fact</h3>
         <p>${malware.funFact}</p>
         
-        <button onclick="closeModal()" style="margin-top: 1rem;">Close</button>
+        ${getSimulationMarkup(malware.name)}
+        <div class="modal-action-row">
+            ${getSimulationButton(malware.name)}
+            <button onclick="closeModal()" style="margin-top: 1rem;">Close</button>
+        </div>
     `;
     document.getElementById('malwareModal').style.display = 'block';
+    if (hasSimulation(malware.name)) {
+        resetSimulation(malware.name);
+        if (openSimulation) {
+            setTimeout(() => startSimulation(malware.name), 80);
+        }
+    }
 }
 
 function closeModal() {
+    stopActiveSimulation();
     document.getElementById('malwareModal').style.display = 'none';
 }
 
